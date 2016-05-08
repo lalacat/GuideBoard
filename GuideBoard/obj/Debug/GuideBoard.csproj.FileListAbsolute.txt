@@ -1,0 +1,12 @@
+d:\documents\visual studio 2013\Projects\GuideBoard\GuideBoard\bin\Debug\GuideBoard.exe.config
+d:\documents\visual studio 2013\Projects\GuideBoard\GuideBoard\obj\Debug\GuideBoard.csprojResolveAssemblyReference.cache
+d:\documents\visual studio 2013\Projects\GuideBoard\GuideBoard\obj\Debug\GuideBoard.MainWindow.resources
+d:\documents\visual studio 2013\Projects\GuideBoard\GuideBoard\obj\Debug\GuideBoard.Properties.Resources.resources
+d:\documents\visual studio 2013\Projects\GuideBoard\GuideBoard\obj\Debug\GuideBoard.csproj.GenerateResource.Cache
+d:\documents\visual studio 2013\Projects\GuideBoard\GuideBoard\bin\Debug\GuideBoard.exe
+d:\documents\visual studio 2013\Projects\GuideBoard\GuideBoard\bin\Debug\GuideBoard.pdb
+d:\documents\visual studio 2013\Projects\GuideBoard\GuideBoard\obj\Debug\GuideBoard.exe
+d:\documents\visual studio 2013\Projects\GuideBoard\GuideBoard\obj\Debug\GuideBoard.pdb
+E:\MyGit\GuideBoard\GuideBoard\bin\Debug\GuideBoard.exe.config
+E:\MyGit\GuideBoard\GuideBoard\obj\Debug\GuideBoard.exe
+E:\MyGit\GuideBoard\GuideBoard\obj\Debug\GuideBoard.pdb
