@@ -47,14 +47,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractInformation.cs" />
     <Compile Include="CommandFunction.cs" />
     <Compile Include="CommandType.cs" />
+    <Compile Include="ContextInfromation.cs" />
     <Compile Include="MainCode.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainCode.Designer.cs">
       <DependentUpon>MainCode.cs</DependentUpon>
     </Compile>
+    <Compile Include="MyException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlDealClass.cs" />
@@ -76,6 +79,7 @@
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </None>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -84,7 +88,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.AccessControl;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Timer = System.Timers.Timer;
 
@@ -181,27 +174,37 @@ namespace GuideBoard
 
         private void _revMessageDealTimer_Elapsed(object sender, EventArgs e)
         { 
-            _revMessageDealTimer.Enabled = false;          
-            string context = Encoding.GetEncoding("gb2312").GetString(_revMessage);             
-            revMessage.Text = context;
-            try
-            {
-                XmlDealClass myXml = new XmlDealClass(context);
-                foreach (var str in myXml.GetInformation())
-                {
-                    Send(str+"\n\r");
-                }
-            }
-            catch (Exception ex)
-            {               
-                Console.WriteLine(ex.Message);
+            _revMessageDealTimer.Enabled = false;
 
-            }
-            _revlength = 0;
+            AbstractInformation ai=new AbstractInformation();
+            AsyncMethodCaller caller=new AsyncMethodCaller(ai.GetContextInfromation);
+            
+            if (_revMessage != null)
+            {
+                string context = Encoding.GetEncoding("gb2312").GetString(_revMessage);             
+                revMessage.Text = context;
+                try
+                {
+                    XmlDealClass myXml = new XmlDealClass(context);
+                    foreach (var str in myXml.GetContextFromXML)
+                    {
+                        Send(str+"\n\r");
+                    }
+                    
+ //                   IAsyncResult result = caller.BeginInvoke();
+                }
+                catch (Exception ex)
+                {               
+                    Console.WriteLine(ex.Message);
+
+                }
+                _revlength = 0;
            
-            //清空数组
-            _revMessage = null;
-            _revMessage=new byte[10240];
+                //清空数组
+                _revMessage = null;
+                _revMessage=new byte[10240];
+            }
+
         }
 
     }

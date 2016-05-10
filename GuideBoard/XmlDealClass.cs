@@ -14,8 +14,12 @@ namespace GuideBoard
         private string _commandFromElement;
 
         private XmlNodeList _deviceList;
+        
         private string[] _detailArray;
         private int[] _deviceNum;
+        private int[] _commandNum;
+        private string[] _contextNum; 
+
 
         private string _degreeData=null;
         private string _directionData=null ;
@@ -23,7 +27,7 @@ namespace GuideBoard
         private string _contextMessage=null;
 
         private string _messageTemp;
-        private string[] _messageFinish; 
+        private int _countGlobal = 0;
         public XmlDealClass(string str)
         {
             try
@@ -38,25 +42,43 @@ namespace GuideBoard
             }
 
         }
-
+       
+        
         private void GetAllDevice()
         {
             if (_myXmlDocument.DocumentElement != null) _deviceList = _myXmlDocument.DocumentElement.ChildNodes;
             _deviceNum=new int[_deviceList.Count];
-            _messageFinish=new string[_deviceList.Count];
-            int countTemp = 0;
+            _commandNum=new int[_deviceList.Count];
+            _contextNum = new string[_deviceList.Count];
             foreach (XmlElement xe in _deviceList.Cast<XmlElement>())
             {
                 Console.WriteLine(xe.LocalName+ ": "+" ID = "+ xe.GetAttribute("ID"));
-                _deviceNum[countTemp] = int.Parse(xe.GetAttribute("ID"));
+                _deviceNum[_countGlobal] = int.Parse(xe.GetAttribute("ID"));
                 
                 DealDeviceMessage(xe);
-                _messageFinish[countTemp] = "[{" + xe.GetAttribute("ID") + "}," + _messageTemp+ "]";
-                _messageTemp = null;
-                Console.WriteLine("_messageFinish: {0}",_messageFinish[countTemp]);
-                countTemp++;
+                if (_messageTemp != null)
+                {
+                    _contextNum[_countGlobal] = "[" + _messageTemp + "]";
+                    _messageTemp = null;
+                }
+                else
+                {
+                    _contextNum[_countGlobal] = null;
+                }
+
+
+                Console.WriteLine("message is : {0}", _contextNum[_countGlobal]);
+                var strSplit = _contextNum[_countGlobal].Split(new char[5]{'[', ']','{','}',',' },StringSplitOptions.RemoveEmptyEntries);
+                foreach (var sp in strSplit)
+                {
+                    Console.WriteLine(sp);
+                }
+                _countGlobal++;
             }
+            _countGlobal = 0;
         }
+
+        
 
         private void DealDeviceMessage(XmlElement xe)
         {
@@ -66,12 +88,17 @@ namespace GuideBoard
                 int commandTemp = 0;
                 _commandFromElement = deviceNodeList[0].InnerText;
 
-                _messageTemp = "{" + _commandFromElement + "}";
+            //    _messageTemp = "{" + _commandFromElement + "}";
               
                 Console.WriteLine(_commandFromElement);
                 //选命令
                 commandTemp = (int) Enum.Parse(typeof(CommandType), _commandFromElement);
-                if (2 <= commandTemp && commandTemp <= 5)
+                _commandNum[_countGlobal] = commandTemp;
+                if (commandTemp==1)
+                {
+                    return;
+                }
+                else if (2 <= commandTemp && commandTemp <= 5)
                 {
                     XmlNodeList contestNodeList = deviceNodeList[1].ChildNodes;
                     int strlen = 0;
@@ -82,15 +109,15 @@ namespace GuideBoard
                         {
                             case "degree":
                                 _degreeData = contestNodeList[i].InnerText;
-                                _messageTemp += ",{" + _degreeData+"}";
+                                _messageTemp += "{" + _degreeData+"}";
                                 break;
                             case "direction":
                                 _directionData = contestNodeList[i].InnerText;
-                                _messageTemp += ",{" + _directionData+"}";
+                                _messageTemp += "{" + _directionData+"},";
                                 break;
                             case "order":
                                 _orderData = contestNodeList[i].InnerText;
-                                _messageTemp += ",{" + _orderData+"}";
+                                _messageTemp += "{" + _orderData+"},";
                                 break;
                             case "detail":
                                 if (strlen == 0)
@@ -105,31 +132,46 @@ namespace GuideBoard
                                                               detailChildList[2].InnerText;
                                 break;
                             default:
-                                Console.WriteLine("格式错误");
+                                throw new XmlException("XMLcontext格式错误");
+                            // Console.WriteLine("格式错误");
                                 break;
                         }
                     }
                     foreach (string t in _detailArray)
                         _messageTemp += ",{" + t+"}";
-                }else if (5 < commandTemp && commandTemp < 10)
+                    if (_messageTemp.StartsWith(","))
+                    {
+                        _messageTemp=_messageTemp.Remove(0, 1);
+                    }
+                }else if (5 < commandTemp && commandTemp <= 10)
                 {
                     if (deviceNodeList[1].Name == "context")
                     {
                         _contextMessage = deviceNodeList[1].InnerText;
                     }
-                    _messageTemp = _commandFromElement + "," + _contextMessage;
+                    _messageTemp ="{"+ _contextMessage+"}";
                 }
                 else
                 {
-                    Console.WriteLine("无此命令");
+                    throw new XmlException("无此命令: "+ _commandFromElement);
+                    // Console.WriteLine("无此命令");
                 }
-                Console.WriteLine("_completeMessage: {0}", _messageTemp);
+        //        Console.WriteLine("_completeMessage: {0}", _messageTemp);
             } 
         }
 
-        public string[] GetInformation()
+        public string[] GetContextFromXML
         {
-            return _messageFinish;
+            get { return _contextNum; }     
+        }
+        public int[] GetCommand
+        {
+            get{ return _commandNum; }
+        }
+
+        public int[] GetDeviceNum
+        {
+            get { return _deviceNum; }
         }
         
     }
