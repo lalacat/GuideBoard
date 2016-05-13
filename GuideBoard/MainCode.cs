@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Data;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -16,10 +18,10 @@ namespace GuideBoard
         private Socket _clientSocket;
         private byte[] _revMessage = new byte[10240];
         private readonly string STX = "$$";
-
         private static readonly ManualResetEvent NetWorkAllDone = new ManualResetEvent(false);
         private static readonly ManualResetEvent GetReConnect=new ManualResetEvent(false);
- 
+        private XML_Window startWindow;
+        private Thread td;
 
         public MainWindow()
         {
@@ -29,8 +31,6 @@ namespace GuideBoard
 
             _revMessageDealTimer = new Timer(interval: 50);
             _revMessageDealTimer.Elapsed += _revMessageDealTimer_Elapsed;
-
-
         }
 
 
@@ -59,14 +59,13 @@ namespace GuideBoard
             {
                 _ipp = new IPEndPoint(IPAddress.Parse(IpAddress.Text), int.Parse(PortValue.Text));
                 _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                Thread getconnecThread = new Thread(new ThreadStart(GetConnectThread));
+                Thread getconnecThread = new Thread(new ThreadStart(GetConnectThread)){IsBackground = true};
                 getconnecThread.Start();
             }
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-
         }
 
         private void GetConnectThread()
@@ -110,6 +109,8 @@ namespace GuideBoard
             RequestState state = (RequestState)ar.AsyncState;
             try
             {
+                if (_revMessage == null)
+                    _revMessage = new byte[10240];
                 Socket handler = state.WorkSocket;
                 int byteRead = handler.EndReceive(ar);
                 string str = Encoding.GetEncoding("gb2312").GetString(state.Buffer, 0,5);
@@ -172,41 +173,86 @@ namespace GuideBoard
             }
         }
 
+        public string context;
         private void _revMessageDealTimer_Elapsed(object sender, EventArgs e)
         { 
             _revMessageDealTimer.Enabled = false;
 
-            AbstractInformation ai=new AbstractInformation();
-            AsyncMethodCaller caller=new AsyncMethodCaller(ai.GetContextInfromation);
-            
+
             if (_revMessage != null)
             {
-                string context = Encoding.GetEncoding("gb2312").GetString(_revMessage);             
+
+                context = Encoding.GetEncoding("gb2312").GetString(_revMessage);             
                 revMessage.Text = context;
+                startWindow=new XML_Window(context);
+                          
+                td=new Thread(new ThreadStart(OpenWindow)){IsBackground = true};   
+
+           //     if (!td.IsAlive)
+           //     {
+               //     td.Start();
+            //    }             
+            
+                
                 try
                 {
                     XmlDealClass myXml = new XmlDealClass(context);
-                    foreach (var str in myXml.GetContextFromXML)
+                    ContextInfromation[] ciTemp = myXml.GetInfromations;
+                    foreach (ContextInfromation cit in ciTemp)
                     {
-                        Send(str+"\n\r");
-                    }
-                    
- //                   IAsyncResult result = caller.BeginInvoke();
+                        string str = null;
+                        Console.Write("ID:" + cit.ID + "\tcommand is " + cit.Command + "\n\r");
+                        if (cit.Command == 1)
+                        {
+                            continue;
+                        }
+                        else if (2 <= cit.Command && cit.Command <= 10)
+                        {
+                            if (cit.Order != null)
+                            {
+                                Console.Write("Order is " + cit.Order + "\tDegree is " + cit.Degree+"\n\r");
+                                Console.Write(cit.Details.Aggregate(str, (current, dt) => current + ("Color is " + dt.Color + "\tFormat is " + dt.Format + "\tData is " + dt.Data + "\n\r")));
+
+                            }
+                            else if(cit.Direction!=null)
+                            {
+                                 Console.Write("Drection is " + cit.Direction + "\tDegree is " + cit.Degree + "\n\r");
+                                 Console.Write(cit.Details.Aggregate(str, (current, dt) => current + ("Color is " + dt.Color + "\tFormat is " + dt.Format+"\tData is " + dt.Data + "\n\r")));
+                            }
+                            else if (cit.Degree != null)
+                            {
+                                Console.Write("Degree is " + cit.Degree + "\n\r");
+                                Console.Write(cit.Details.Aggregate(str, (current, dt) => current + ("Color is " + dt.Color + "\tFormat is " + dt.Format + "\tData is " + dt.Data + "\n\r")));
+                            }
+                            else if (cit.Details != null)
+                            {
+                                Console.Write(cit.Details.Aggregate(str, (current, dt) => current + ("Color is " + dt.Color + "\tFormat is " + dt.Format + "\tData is " + dt.Data + "\n\r")));
+                            }
+                            else if(cit.Context!=null)
+                            {
+                                 Console.WriteLine( "Context is" + cit.Context);
+                            }
+                        }
+ 
+                    }                       
+
                 }
                 catch (Exception ex)
                 {               
                     Console.WriteLine(ex.Message);
 
                 }
-                _revlength = 0;
-           
-                //清空数组
+                _revlength = 0;  
                 _revMessage = null;
-                _revMessage=new byte[10240];
             }
+                context = null;
 
         }
 
+        private void OpenWindow()
+        {
+            Application.Run(startWindow);
+        }
     }
 }
 

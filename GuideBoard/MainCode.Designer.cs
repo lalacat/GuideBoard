@@ -43,7 +43,6 @@
             this.IpAddress.Size = new System.Drawing.Size(116, 21);
             this.IpAddress.TabIndex = 0;
             this.IpAddress.Text = "192.168.1.101";
-
             // 
             // PortValue
             // 
@@ -88,7 +87,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.revMessage.Location = new System.Drawing.Point(8, 43);
             this.revMessage.Name = "revMessage";
-            this.revMessage.Size = new System.Drawing.Size(387, 299);
+            this.revMessage.Size = new System.Drawing.Size(425, 254);
             this.revMessage.TabIndex = 5;
             this.revMessage.Text = "";
             // 
@@ -96,7 +95,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(407, 354);
+            this.ClientSize = new System.Drawing.Size(445, 309);
             this.Controls.Add(this.revMessage);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);

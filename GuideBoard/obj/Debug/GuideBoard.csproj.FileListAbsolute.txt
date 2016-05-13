@@ -17,3 +17,4 @@ E:\MyGit\GuideBoard\GuideBoard\obj\Debug\GuideBoard.csprojResolveAssemblyReferen
 E:\MyGit\GuideBoard\GuideBoard\obj\Debug\GuideBoard.MainWindow.resources
 E:\MyGit\GuideBoard\GuideBoard\obj\Debug\GuideBoard.Properties.Resources.resources
 E:\MyGit\GuideBoard\GuideBoard\obj\Debug\GuideBoard.csproj.GenerateResource.Cache
+E:\MyGit\GuideBoard\GuideBoard\obj\Debug\GuideBoard.XML_Window.resources
